@@ -190,8 +190,8 @@ var vm = new Vue({
         },
         initialize: function () {
             callApi().withSuccessHandler(function (res) {
-                vm.users = res.users || ["user1", "user2"];
-                vm.amountDiff = res.amountDiff || 0;
+                vm.users = res.users;
+                vm.amountDiff = res.amountDiff;
                 vm.payer = vm.amountDiff < 0 ? 1 : 0;
                 vm.$watch("users", function () { this.saveConfigurations(); });
                 toast("同期しました");

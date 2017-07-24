@@ -8,8 +8,8 @@ function doGet () {
 
 function doFetchLastState () {
     return {
-        users: dbFind("kvs", "users"),
-        amountDiff: dbFind("kvs", "amountDiff")
+        users: dbFind("kvs", "users") || ["user1", "user2"],
+        amountDiff: dbFind("kvs", "amountDiff") || 0,
     };
 }
 
