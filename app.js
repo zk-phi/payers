@@ -20,6 +20,7 @@ function doFetchLastState () {
     return {
         users: dbFind("kvs", "users") || ["user1", "user2"],
         amountDiff: dbFind("kvs", "amountDiff") || 0,
+        log: dbFind("kvs", "log") || []
     };
 }
 

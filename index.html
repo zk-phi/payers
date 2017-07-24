@@ -76,6 +76,13 @@
                 <td>メモ</td>
               </tr>
             </thead>
+            <tbody>
+              <tr v-for="entry in log">
+                <td><span v-if="!entry.payer">{{ entry.amount }}</span></td>
+                <td><span v-if="entry.payer">{{ entry.amount }}</span></td>
+                <td>{{ entry.memo }}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -168,13 +175,9 @@ var vm = new Vue({
     el: "#app",
     data: {
         /* configurations */
-        users:      ["-", "-"],
-        amountDiff: 0,
+        users: ["-", "-"], amountDiff: 0, log: [],
         /* input */
-        payer:      0,
-        amount:     0,
-        location:   {},
-        memo:       ""
+        payer: 0, amount: 0, location: {}, memo: ""
     },
     created: function () {
         this.initialize();
@@ -198,6 +201,7 @@ var vm = new Vue({
             callApi().withSuccessHandler(function (res) {
                 vm.users = res.users;
                 vm.amountDiff = res.amountDiff;
+                vm.log = res.log;
                 vm.payer = vm.amountDiff < 0 ? 1 : 0;
                 vm.$watch("users", function () { this.saveConfigurations(); });
                 toast("同期しました");
@@ -211,6 +215,7 @@ var vm = new Vue({
         pay: function () {
             var amount = parseInt(this.amount);
             callApi().withSuccessHandler(function () {
+                vm.log.unshift({ payer: vm.payer, amount: amount, location: vm.location, memo: vm.memo});
                 vm.amountDiff = vm.payer ? vm.amountDiff + amount : vm.amountDiff - amount;
                 vm.payer = vm.amountDiff < 0 ? 1 : 0;
                 vm.amount = 0;
