@@ -17,7 +17,7 @@
       <h1 class="page-header">
         <small>次は</small>
         <editable-text v-model="users[amountDiff < 0 ? 1 : 0]"></editable-text>
-        <small>が払うのがよさそう</small>
+        <small>が払うのがよさそう (-{{ Math.abs(amountDiff) }})</small>
       </h1>
 
       <div class="panel panel-default">
