@@ -43,7 +43,7 @@
               <label>メモ</label>
               <input type="text" class="form-control" v-model="memo">
             </div>
-            <input type="button" class="btn btn-primary" value="払う">
+            <input type="button" class="btn btn-primary" value="払う" @click="pay">
           </div>
 
           <hr>
@@ -207,6 +207,17 @@ var vm = new Vue({
             callApi().withSuccessHandler(function () {
                 toast("設定を保存しました", "success");
             }).doSaveUsernames(this.users);
+        },
+        pay: function () {
+            var amount = parseInt(this.amount);
+            callApi().withSuccessHandler(function () {
+                vm.amountDiff = vm.payer ? vm.amountDiff + amount : vm.amountDiff - amount;
+                vm.payer = vm.amountDiff < 0 ? 1 : 0;
+                vm.amount = 0;
+                vm.location = {};
+                vm.memo = "";
+                toast("ログを保存しました", "success");
+            }).doPay(this.payer, amount, this.location, this.memo);
         }
     }
 })

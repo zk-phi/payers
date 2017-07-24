@@ -26,3 +26,12 @@ function doFetchLastState () {
 function doSaveUsernames (users) {
     dbSet("kvs", "users", users);
 }
+
+function doPay (payer, amount, location, memo) {
+    var log = dbFind("kvs", "log") || [];
+    var diff = dbFind("kvs", "amountDiff") || 0;
+    log.unshift({ payer: payer, amount: amount, location: location, memo: memo});
+    diff = payer ? diff + amount : diff - amount;
+    dbSet("kvs", "log", log);
+    dbSet("kvs", "amountDiff", diff);
+}
