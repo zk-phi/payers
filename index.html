@@ -75,14 +75,6 @@
 
 </html>
 
-<!-- Style -->
-
-<style>
-#toast-area { position: fixed; width: 100%; left: 0px; top: 0px; z-index: 10; }
-.toast { margin: 10px 0px 0px auto; width: 250px; }
-.map { height: 130px; max-width: 100%; }
-</style>
-
 <!-- Component: Editable text -->
 
 <template id="editable-text">
@@ -106,9 +98,7 @@ Vue.component("editable-text", {
     template: "#editable-text",
     props: ["value"],
     data: function () {
-        return {
-            input: null
-        }
+        return { input: null };
     },
     methods: {
         edit: function () {
@@ -120,14 +110,23 @@ Vue.component("editable-text", {
             e.preventDefault();
         }
     }
-})
+});
 </script>
 
 <!-- Component: Google Map -->
 
+<template id="google-map">
+  <div class="google-map">
+  </div>
+</template>
+
+<style>
+.google-map { height: 130px; max-width: 100%; }
+</style>
+
 <script>
 Vue.component("google-map", {
-    template: "<div></div>",
+    template: "#google-map",
     props: ["lat", "lng"],
     mounted: function () {
         new google.maps.Map(this.$el, {
@@ -139,6 +138,11 @@ Vue.component("google-map", {
 </script>
 
 <!-- App -->
+
+<style>
+#toast-area { position: fixed; width: 100%; left: 0px; top: 0px; z-index: 10; }
+.toast { margin: 10px 0px 0px auto; width: 250px; }
+</style>
 
 <script>
 function toast (message, type) {
@@ -157,7 +161,6 @@ function callApi () {
 var vm = new Vue({
     el: "#app",
     data: {
-        /* configurations */
         users: ["-", "-"], amountDiff: 0, log: [],
         /* input */
         payer: 0, amount: 0, location: null
