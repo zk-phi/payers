@@ -1,8 +1,9 @@
 var TITLE = "お金の貸し借り💰";
+var MAPS_API_KEY = PropertiesService.getScriptProperties().getProperty("MAPS_API_KEY");
 
 function doGet () {
     var template = HtmlService.createTemplateFromFile("index.html");
-    template.MAPS_API_KEY = PropertiesService.getScriptProperties().getProperty("MAPS_API_KEY");
+    template.MAPS_API_KEY = MAPS_API_KEY;
     return template.evaluate().setTitle(TITLE);
 }
 
