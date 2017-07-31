@@ -4,7 +4,11 @@ var MAPS_API_KEY = PropertiesService.getScriptProperties().getProperty("MAPS_API
 function doGet () {
     var template = HtmlService.createTemplateFromFile("index.html");
     template.MAPS_API_KEY = MAPS_API_KEY;
-    return template.evaluate().setTitle(TITLE);
+
+    var html = template.evaluate();
+    html.setTitle(TITLE);
+    html.addMetaTag("viewport", "width=device-width, initial-scale=1");
+    return html;
 }
 
 function doFetchLastState () {
