@@ -198,14 +198,19 @@ var vm = new Vue({
                 toast("位置情報の取得に失敗しました", "danger");
             }
         },
+        resetInput: function () {
+            this.payer = this.amountDiff < 0 ? 1 : 0;
+            this.amount = 0;
+            this.memo = "";
+        },
         initialize: function () {
             callApi().withSuccessHandler(function (res) {
                 vm.users = res.users;
-                vm.amountDiff = res.amountDiff;
                 vm.log = res.log;
-                vm.payer = vm.amountDiff < 0 ? 1 : 0;
-                vm.$watch("users", function () { this.saveConfigurations(); });
+                vm.amountDiff = res.amountDiff;
+                vm.resetInput();
                 toast("同期しました");
+                vm.$watch("users", function () { this.saveConfigurations(); });
             }).doFetchLastState();
         },
         saveConfigurations: function () {
@@ -215,13 +220,10 @@ var vm = new Vue({
         },
         pay: function () {
             var amount = parseInt(this.amount);
-            callApi().withSuccessHandler(function () {
-                vm.log.unshift({ payer: vm.payer, amount: amount, location: vm.location, memo: vm.memo});
-                vm.amountDiff = vm.payer ? vm.amountDiff + amount : vm.amountDiff - amount;
-                vm.payer = vm.amountDiff < 0 ? 1 : 0;
-                vm.amount = 0;
-                vm.location = {};
-                vm.memo = "";
+            callApi().withSuccessHandler(function (res) {
+                vm.log = res.log;
+                vm.amountDiff = res.amountDiff;
+                vm.resetInput();
                 toast("ログを保存しました", "success");
             }).doPay(this.payer, amount, this.location, this.memo);
         }

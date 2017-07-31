@@ -21,6 +21,7 @@ function doFetchLastState () {
 
 function doSaveUsernames (users) {
     dbSet("kvs", "users", users);
+    return users;
 }
 
 function doPay (payer, amount, location, memo) {
@@ -30,4 +31,5 @@ function doPay (payer, amount, location, memo) {
     diff = payer ? diff + amount : diff - amount;
     dbSet("kvs", "log", log);
     dbSet("kvs", "amountDiff", diff);
+    return { log: log, amountDiff: diff };
 }
