@@ -38,12 +38,7 @@
               </div>
             </div>
 
-            <input type="button" class="btn btn-primary" value="払った" @click="pay">
-
-            <div class="form-group">
-              <label>メモ</label>
-              <input type="text" class="form-control" v-model="memo">
-            </div>
+            <button type="submit" class="btn btn-primary" @click="pay">払った</button>
           </div>
 
           <hr>
@@ -73,14 +68,12 @@
               <tr>
                 <td><editable-text v-model="users[0]"></editable-text></td>
                 <td><editable-text v-model="users[1]"></editable-text></td>
-                <td>メモ</td>
               </tr>
             </thead>
             <tbody>
               <tr v-for="entry in log">
                 <td><span v-if="!entry.payer">{{ entry.amount }}</span></td>
                 <td><span v-if="entry.payer">{{ entry.amount }}</span></td>
-                <td>{{ entry.memo }}</td>
               </tr>
             </tbody>
           </table>
@@ -177,7 +170,7 @@ var vm = new Vue({
         /* configurations */
         users: ["-", "-"], amountDiff: 0, log: [],
         /* input */
-        payer: 0, amount: 0, location: {}, memo: ""
+        payer: 0, amount: 0, location: {}
     },
     created: function () {
         this.initialize();
@@ -201,7 +194,6 @@ var vm = new Vue({
         resetInput: function () {
             this.payer = this.amountDiff < 0 ? 1 : 0;
             this.amount = 0;
-            this.memo = "";
         },
         initialize: function () {
             callApi().withSuccessHandler(function (res) {
@@ -225,7 +217,7 @@ var vm = new Vue({
                 vm.amountDiff = res.amountDiff;
                 vm.resetInput();
                 toast("ログを保存しました", "success");
-            }).doPay(this.payer, amount, this.location, this.memo);
+            }).doPay(this.payer, amount, this.location);
         }
     }
 })

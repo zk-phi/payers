@@ -24,10 +24,10 @@ function doSaveUsernames (users) {
     return users;
 }
 
-function doPay (payer, amount, location, memo) {
+function doPay (payer, amount, location) {
     var log = dbFind("kvs", "log") || [];
     var diff = dbFind("kvs", "amountDiff") || 0;
-    log.unshift({ payer: payer, amount: amount, location: location, memo: memo});
+    log.unshift({ payer: payer, amount: amount, location: location });
     diff = payer ? diff + amount : diff - amount;
     dbSet("kvs", "log", log);
     dbSet("kvs", "amountDiff", diff);
