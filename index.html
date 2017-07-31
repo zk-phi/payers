@@ -21,42 +21,32 @@
       <div class="panel panel-default">
         <div class="panel-heading">払う</div>
         <div class="panel-body">
-          <div class="form-inline">
-            <div class="form-group">
-              <div class="input-group">
-                <select class="form-control" v-model="payer">
-                  <option value="0">{{ users[0] }}</option>
-                  <option value="1">{{ users[1] }}</option>
-                </select>
-                <span class="input-group-addon">が</span>
+          <p>
+            <div class="form-inline">
+              <div class="form-group">
+                <div class="input-group">
+                  <select class="form-control" v-model="payer">
+                    <option value="0">{{ users[0] }}</option>
+                    <option value="1">{{ users[1] }}</option>
+                  </select>
+                  <span class="input-group-addon">が</span>
+                </div>
               </div>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="text" class="form-control" v-model="amount" />
-                <span class="input-group-addon">円</span>
+              <div class="form-group">
+                <div class="input-group">
+                  <input type="text" class="form-control" v-model="amount" />
+                  <span class="input-group-addon">円</span>
+                </div>
               </div>
+              <button type="submit" class="btn btn-primary" @click="pay">払った</button>
             </div>
-
-            <button type="submit" class="btn btn-primary" @click="pay">払った</button>
-          </div>
-
-          <hr>
-
-          <div class="form-inline">
-            <label>位置情報</label>
-            <div class="form-group">
-              <label>緯度</label>
-              <input type="text" class="form-control" v-model="location.lat" />
-            </div>
-            <div class="form-group">
-              <label>経度</label>
-              <input type="text" class="form-control" v-model="location.lng" />
+          </p>
+          <div v-if="!!location" class="panel panel-default">
+            <div class="panel-body">
+              <label>位置情報</label>
+              <google-map class="map" :lat="35.658034" :lng="139.701636"></google-map>
             </div>
           </div>
-
-          <google-map class="map" :lat="35.658034" :lng="139.701636"></google-map>
-
         </div>
       </div>
 
@@ -170,7 +160,7 @@ var vm = new Vue({
         /* configurations */
         users: ["-", "-"], amountDiff: 0, log: [],
         /* input */
-        payer: 0, amount: 0, location: {}
+        payer: 0, amount: 0, location: null
     },
     created: function () {
         this.initialize();
@@ -183,11 +173,11 @@ var vm = new Vue({
                     vm.location = { lat: res.coords.latitude, lng: res.coords.longitude };
                     toast("位置情報を取得しました");
                 }, function (res) {
-                    vm.location = {};
+                    vm.location = null;
                     toast("位置情報の取得に失敗しました", "danger");
                 });
             } else {
-                this.location = {};
+                this.location = null;
                 toast("位置情報の取得に失敗しました", "danger");
             }
         },
