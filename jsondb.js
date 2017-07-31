@@ -1,3 +1,5 @@
+var SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+
 /* internal functions */
 
 function _makeKey () {
@@ -24,7 +26,7 @@ function _getAll (sheet) {
 }
 
 function _getSheet (name) {
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
     return spreadsheet.getSheetByName(name) || spreadsheet.insertSheet(name);
 }
 
