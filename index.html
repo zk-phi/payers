@@ -39,11 +39,13 @@
                 <span class="input-group-addon">円</span>
               </div>
             </div>
+
+            <input type="button" class="btn btn-primary" value="払った" @click="pay">
+
             <div class="form-group">
               <label>メモ</label>
               <input type="text" class="form-control" v-model="memo">
             </div>
-            <input type="button" class="btn btn-primary" value="払う" @click="pay">
           </div>
 
           <hr>
@@ -97,7 +99,7 @@
 <style>
 #toast-area { position: fixed; width: 100%; left: 0px; top: 0px; z-index: 10; }
 .toast { margin: 10px 0px 0px auto; width: 250px; }
-.map { height: 150px; max-width: 100%; }
+.map { height: 130px; max-width: 100%; }
 </style>
 
 <!-- Component: Editable text -->
@@ -149,7 +151,7 @@ Vue.component("google-map", {
     mounted: function () {
         new google.maps.Map(this.$el, {
             center: { lat: this.lat, lng: this.lng },
-            zoom: 15
+            zoom: 18
         });
     }
 });
