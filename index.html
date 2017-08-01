@@ -34,6 +34,14 @@
               </div>
               <div class="form-group">
                 <div class="input-group">
+                  <select class="form-control" v-model="category">
+                    <option v-for="cat in categories" :value="cat.key">{{ cat.label }}</option>
+                  </select>
+                  <span class="input-group-addon">で</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
                   <input type="text" class="form-control" v-model="amount" />
                   <span class="input-group-addon">円</span>
                 </div>
@@ -174,9 +182,9 @@ new Vue({
     el: "#app",
     data: {
         /* store */
-        users: ["-", "-"], amountDiff: 0, log: [],
+        users: ["-", "-"], amountDiff: 0, log: [], categories: [],
         /* input */
-        payer: 0, amount: 0, location: null,
+        payer: 0, amount: 0, location: null, category: 1,
         /* UI states */
         loading: false
     },
@@ -228,6 +236,7 @@ new Vue({
         resetInput: function () {
             this.payer = this.default_payer;
             this.amount = 0;
+            this.category = 1;
         },
         initialize: function () {
             var self = this;
@@ -235,6 +244,7 @@ new Vue({
                 self.users = res.users;
                 self.log = res.log;
                 self.amountDiff = res.amountDiff;
+                self.categories = res.categories;
                 self.resetInput();
                 self.toast("同期しました");
                 self.$watch("users", function () { this.saveConfigurations(); });
@@ -254,7 +264,7 @@ new Vue({
                 self.amountDiff = res.amountDiff;
                 self.resetInput();
                 self.toast("ログを保存しました", "success");
-            }).doPay(this.payer, amount, this.location);
+            }).doPay(this.payer, amount, this.location, this.category, (new Date()).toString());
         }
     }
 })
