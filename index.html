@@ -183,7 +183,7 @@ function callApi () {
     });
 }
 
-var vm = new Vue({
+new Vue({
     el: "#app",
     data: {
         users: ["-", "-"], amountDiff: 0, log: [],
@@ -205,11 +205,12 @@ var vm = new Vue({
     methods: {
         getGeolocation: function () {
             if (navigator.geolocation) {
+                var self = this;
                 navigator.geolocation.getCurrentPosition(function (res) {
-                    vm.location = { lat: res.coords.latitude, lng: res.coords.longitude };
+                    self.location = { lat: res.coords.latitude, lng: res.coords.longitude };
                     toast("位置情報を取得しました");
                 }, function (res) {
-                    vm.location = null;
+                    self.location = null;
                     toast("位置情報の取得に失敗しました", "danger");
                 });
             } else {
@@ -222,13 +223,14 @@ var vm = new Vue({
             this.amount = 0;
         },
         initialize: function () {
+            var self = this;
             callApi().withSuccessHandler(function (res) {
-                vm.users = res.users;
-                vm.log = res.log;
-                vm.amountDiff = res.amountDiff;
-                vm.resetInput();
+                self.users = res.users;
+                self.log = res.log;
+                self.amountDiff = res.amountDiff;
+                self.resetInput();
                 toast("同期しました");
-                vm.$watch("users", function () { this.saveConfigurations(); });
+                self.$watch("users", function () { this.saveConfigurations(); });
             }).doFetchLastState();
         },
         saveConfigurations: function () {
@@ -237,11 +239,12 @@ var vm = new Vue({
             }).doSaveUsernames(this.users);
         },
         pay: function () {
+            var self = this;
             var amount = parseInt(this.amount);
             callApi().withSuccessHandler(function (res) {
-                vm.log = res.log;
-                vm.amountDiff = res.amountDiff;
-                vm.resetInput();
+                self.log = res.log;
+                self.amountDiff = res.amountDiff;
+                self.resetInput();
                 toast("ログを保存しました", "success");
             }).doPay(this.payer, amount, this.location);
         }
