@@ -44,7 +44,7 @@
           <div v-if="!!location" class="panel panel-default">
             <div class="panel-body">
               <label>位置情報</label>
-              <google-map class="map" :lat="35.658034" :lng="139.701636"></google-map>
+              <google-map class="map" :markers="[location]"></google-map>
             </div>
           </div>
         </div>
@@ -115,24 +115,40 @@ Vue.component("editable-text", {
 
 <!-- Component: Google Map -->
 
-<template id="google-map">
-  <div class="google-map">
-  </div>
-</template>
-
 <style>
 .google-map { height: 130px; max-width: 100%; }
 </style>
 
 <script>
 Vue.component("google-map", {
-    template: "#google-map",
-    props: ["lat", "lng"],
+    template: "<div class='google-map'></div>",
+    props: ["markers"],
+    data: function () {
+        return { map_obj: null, marker_objs: [] };
+    }
+    watch: {
+        markers: function () {
+            this.sync_markers();
+        }
+    },
     mounted: function () {
-        new google.maps.Map(this.$el, {
-            center: { lat: this.lat, lng: this.lng },
-            zoom: 18
-        });
+        this.map_obj = new google.maps.Map(this.$el);
+        this.sync_markers();
+    },
+    methods: {
+        sync_markers: function () {
+            var bounds = new google.maps.LatLngBounds();
+            for (var i = 0; i < this.marker_objs.length; i++){
+                this.marker_objs[i].setMap(null);
+            }
+            this.marker_objs = this.markers.map(function (location) {
+                var pos = new google.maps.LatLng(location.lat, location.lng);
+                bounds.extend(pos);
+                return new google.maps.Marker({ map: this.map_obj, position: pos });
+            });
+            this.map_obj.fitBounds(bounds);
+            if (this.map.getZoom() > 10) this.map.setZoom(10); /* do not zoom-in too much */
+        }
     }
 });
 </script>
@@ -161,9 +177,12 @@ function callApi () {
 var vm = new Vue({
     el: "#app",
     data: {
+        /* store */
         users: ["-", "-"], amountDiff: 0, log: [],
         /* input */
-        payer: 0, amount: 0, location: null
+        payer: 0, amount: 0, location: null,
+        /* UI states */
+        loading: false
     },
     created: function () {
         this.initialize();
