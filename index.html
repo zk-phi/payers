@@ -14,7 +14,7 @@
     <div id="app" class="container">
       <h1 class="page-header">
         <small>次は</small>
-        <editable-text v-model="users[default_payer]"></editable-text>
+        <editable-text v-model="users[default_payer]" :disabled="loading"></editable-text>
         <small>が払うのがよさそう (-{{ Math.abs(amountDiff) }})</small>
       </h1>
 
@@ -38,7 +38,7 @@
                   <span class="input-group-addon">円</span>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary" @click="pay">払った</button>
+              <button type="submit" class="btn btn-primary" :disabled="loading" @click="pay">払った</button>
             </div>
           </p>
           <div v-if="!!location" class="panel panel-default">
@@ -56,8 +56,8 @@
           <table class="table">
             <thead>
               <tr>
-                <td><editable-text v-model="users[0]"></editable-text></td>
-                <td><editable-text v-model="users[1]"></editable-text></td>
+                <td><editable-text v-model="users[0]" :disabled="loading"></editable-text></td>
+                <td><editable-text v-model="users[1]" :disabled="loading"></editable-text></td>
               </tr>
             </thead>
             <tbody>
@@ -83,7 +83,7 @@
       <div class="input-group">
         <input type="text" class="form-control" v-model="input" />
         <span class="input-group-btn">
-          <button class="btn btn-default" @click="save">
+          <button class="btn btn-default" :disabled="disabled" @click="save">
             <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
           </button>
         </span>
@@ -96,7 +96,7 @@
 <script>
 Vue.component("editable-text", {
     template: "#editable-text",
-    props: ["value"],
+    props: ["value", "disabled"],
     data: function () {
         return { input: null };
     },
@@ -170,25 +170,15 @@ Vue.component("google-map", {
 </style>
 
 <script>
-function toast (message, type) {
-    $("<div class='toast alert alert-" + (type || "info") + "'>" + message + "</div>")
-        .appendTo("#toast-area").hide().fadeIn(300).delay(2000).hide(300, function () {
-            $(this).remove();
-        });
-}
-
-function callApi () {
-    return google.script.run.withFailureHandler(function (e) {
-        toast(e.message, "danger");
-    });
-}
-
 new Vue({
     el: "#app",
     data: {
+        /* store */
         users: ["-", "-"], amountDiff: 0, log: [],
         /* input */
-        payer: 0, amount: 0, location: null
+        payer: 0, amount: 0, location: null,
+        /* UI states */
+        loading: false
     },
     computed: {
         location_map_markers: function () {
@@ -203,19 +193,36 @@ new Vue({
         this.getGeolocation();
     },
     methods: {
+        toast: function (message, type) {
+            $("<div class='toast alert alert-" + (type || "info") + "'>" + message + "</div>")
+                .appendTo("#toast-area").hide().fadeIn(300).delay(2000).hide(300, function () {
+                    $(this).remove();
+                });
+        },
+        call_api_with_handler: function (handler) {
+            var self = this;
+            self.loading = true;
+            return google.script.run.withFailureHandler(function (e) {
+                self.loadig = false;
+                self.toast(e.message, "danger");
+            }).withSuccessHandler(function (e) {
+                self.loading = false;
+                handler(e);
+            });
+        },
         getGeolocation: function () {
             if (navigator.geolocation) {
                 var self = this;
                 navigator.geolocation.getCurrentPosition(function (res) {
                     self.location = { lat: res.coords.latitude, lng: res.coords.longitude };
-                    toast("位置情報を取得しました");
+                    self.toast("位置情報を取得しました");
                 }, function (res) {
                     self.location = null;
-                    toast("位置情報の取得に失敗しました", "danger");
+                    self.toast("位置情報の取得に失敗しました", "danger");
                 });
             } else {
                 this.location = null;
-                toast("位置情報の取得に失敗しました", "danger");
+                this.toast("位置情報の取得に失敗しました", "danger");
             }
         },
         resetInput: function () {
@@ -224,28 +231,29 @@ new Vue({
         },
         initialize: function () {
             var self = this;
-            callApi().withSuccessHandler(function (res) {
+            this.call_api_with_handler(function (res) {
                 self.users = res.users;
                 self.log = res.log;
                 self.amountDiff = res.amountDiff;
                 self.resetInput();
-                toast("同期しました");
+                self.toast("同期しました");
                 self.$watch("users", function () { this.saveConfigurations(); });
             }).doFetchLastState();
         },
         saveConfigurations: function () {
-            callApi().withSuccessHandler(function () {
-                toast("設定を保存しました", "success");
+            var self = this;
+            this.call_api_with_handler(function () {
+                self.toast("設定を保存しました", "success");
             }).doSaveUsernames(this.users);
         },
         pay: function () {
             var self = this;
             var amount = parseInt(this.amount);
-            callApi().withSuccessHandler(function (res) {
+            this.call_api_with_handler(function (res) {
                 self.log = res.log;
                 self.amountDiff = res.amountDiff;
                 self.resetInput();
-                toast("ログを保存しました", "success");
+                self.toast("ログを保存しました", "success");
             }).doPay(this.payer, amount, this.location);
         }
     }
